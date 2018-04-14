@@ -1,0 +1,19 @@
+{
+  "name": "lottery_chain",
+  "version": "1.0.0",
+  "description": "Lottery Blockchain",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jcarrizobrass/lottery_chain.git"
+  },
+  "author": "tristancorp",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/jcarrizobrass/lottery_chain/issues"
+  },
+  "homepage": "https://github.com/jcarrizobrass/lottery_chain#readme"
+}
