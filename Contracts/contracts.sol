@@ -1,7 +1,12 @@
 pragma solidity ^0.4.2;
 
+require
+
 
 contract LotteryChain {
+
+
+
 
       // Events
       event But_ticket(address _user);
@@ -13,13 +18,20 @@ contract LotteryChain {
       uint public precio;
       address public bank;
 
+
+
       //lottery start day
       uint public dia_inicio;
+
+      uint public moment_closes;
+      uint public moment_lottery;
+
+
       mapping(uint => address[]) public tickets;
 
       //lottery total tickets sell
       uint public total_tickets;
-
+      uint public total_winners;
 
     function _transfer(address _from, address _to, uint _value) internal {
         // Prevent transfer to 0x0 address. Use burn() instead
@@ -79,6 +91,47 @@ contract LotteryChain {
 
         //insert_bet(guess, msg.sender);
         //Buy_ticket(msg.sender);
+      }
+
+
+
+      function closeBets(){
+        if(now >= moment_closes){
+          betsclosed = true;
+        }
+      }
+
+      function StartLottery() private returns (uint256,uint256){
+          if(now >= moment_lottery)
+          {
+            var number1 = ;
+            var number2 = ;
+            return ;
+          }
+
+      }
+
+      function Check_results(){
+        for (uint i = 0; i< tickets.length; i++){
+          if((tickets[i].ticket.number1==number1 && tickets[i].ticket.number2==number2) || (tickets[i].ticket.number2==number1 && tickets[i].number1==number2)){
+              pools[pool_index].winners.push(pools[pool_index].tickets[i].ticket.address);
+              total_winners++;
+          }
+        }
+      }
+
+      function Pay_winners(){
+          pools[pool_index].winners
+
+      }
+
+      function Reset_pool(){
+        betsclosed = false;
+        moment_now = block.timestamp;
+        moment_closes = block.timestamp + 7 days;
+        moment_lottery = moment_closes + 1 hours;
+        pool_index++;
+
       }
 
 }
