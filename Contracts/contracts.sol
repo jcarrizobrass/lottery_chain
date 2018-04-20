@@ -121,6 +121,7 @@ contract LotteryChain {
       }
 
       function Pay_winners(){
+
           pools[pool_index].winners
 
       }
