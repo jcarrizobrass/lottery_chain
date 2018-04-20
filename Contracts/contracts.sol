@@ -1,98 +1,69 @@
 pragma solidity ^0.4.2;
+contract Lottery {
 
-require
-
-
-contract LotteryChain {
-
-
-
-
-      // Events
-      event But_ticket(address _user);
-      event Transfer(address indexed from, address indexed to, uint256 value);
-      mapping(uint => uint) public lista_tickets;
-      mapping (address => uint256) public balanceOf;
-      mapping (address => mapping (address => uint256)) public allowance;
-      //Ticket price
-      uint public precio;
-      address public bank;
-
-
-
-      //lottery start day
-      uint public dia_inicio;
-
-      uint public moment_closes;
-      uint public moment_lottery;
-
-
-      mapping(uint => address[]) public tickets;
-
-      //lottery total tickets sell
-      uint public total_tickets;
-      uint public total_winners;
-
-    function _transfer(address _from, address _to, uint _value) internal {
-        // Prevent transfer to 0x0 address. Use burn() instead
-        require(_to != 0x0);
-        // Check if the sender has enough
-        require(balanceOf[_from] >= _value);
-        // Check for overflows
-        require(balanceOf[_to] + _value >= balanceOf[_to]);
-        // Save this for an assertion in the future
-        uint previousBalances = balanceOf[_from] + balanceOf[_to];
-        // Subtract from the sender
-        balanceOf[_from] -= _value;
-        // Add the same to the recipient
-        balanceOf[_to] += _value;
-        emit Transfer(_from, _to, _value);
-        // Asserts are used to use static analysis to find bugs in your code. They should never fail
-        assert(balanceOf[_from] + balanceOf[_to] == previousBalances);
+      struct Ticket {
+       address adr;
+       uint256 number1;
+       uint256 number2;
     }
 
-        function transfer(address _to, uint256 _value) public {
-        _transfer(msg.sender, _to, _value);
-    }
-
-
-    function transferFrom(address _from, address _to, uint256 _value) public returns (bool success) {
-        require(_value <= allowance[_from][msg.sender]);     // Check allowance
-        allowance[_from][msg.sender] -= _value;
-        _transfer(_from, _to, _value);
-        return true;
-    }
-
-
-
-      function LotteryChain(uint _dia_inicio) {
-        precio = 0.001 ether;
-        dia_inicio = _dia_inicio;
-        reset_tickets();
+      struct Winners {
+          address adr;
       }
 
-      function reset_tickets() private {
+    address public owner;
+    Ticket[] public tickets;
+    uint public total_tickets;
+    uint public ticket_price;
+    uint public betting_period;
+    uint public waiting_period;
+    uint public total_winners;
+    bool public betsclosed;
+    uint public tickets_init;
+    uint public total_pool;
+    uint public next_round;
+    uint256 moment_now;
+    uint256 moment_closes;
+    uint256 moment_lottery;
+    uint256 count_down;
+
+    Winners[] public winners;
+
+
+    function Lottery(uint _betting_period, uint _waiting_period) {
+      ticket_price = 0.1 ether;
       total_tickets = 0;
-      }
+      tickets_init = 0;
+      owner = msg.sender;
+      moment_now = now;
+      moment_closes = moment_now +2 minutes;
+      moment_lottery = moment_now + 1 minutes;
 
-      function agregar_ticket(uint guess, address _user) private {
 
     }
-      function comprar_ticket(uint guess, address _from, uint _value) internal {
-        // check payment is correct
-        if (msg.value != precio) throw;
 
-        // Subtract from the sender
-        transfer(bank, _value);
-        tickets[guess].push(_from);
+    function create_ticket(uint256 n1, uint256 n2){
+      tickets.push(Ticket({
+          adr: msg.sender,
+          number1: n1,
+          number2: n2
+      }));
+      total_tickets += 1;
 
-        total_tickets += 1;
-        // Add the same to the recipient
+    }
 
-        //insert_bet(guess, msg.sender);
-        //Buy_ticket(msg.sender);
-      }
+        function buy_ticket(uint256 n1, uint256 n2) public payable {
+      require(msg.value == ticket_price);
+    //   require(0 > n1 && n1  <= 11);
+    //   require(0 > n2 && n2  <= 11);
+      require(betsclosed == false);
+      create_ticket(n1,n2);
+      total_pool += msg.value;
+   }
 
+    function reset_tickets() private {
+      total_tickets = 0;
+    }
 
 
       function closeBets(){
@@ -101,38 +72,76 @@ contract LotteryChain {
         }
       }
 
-      function StartLottery() private returns (uint256,uint256){
-          if(now >= moment_lottery)
-          {
-            var number1 = ;
-            var number2 = ;
-            return ;
-          }
-
+      function random() private view returns (uint8) {
+        // return uint8(uint256(keccak256(block.timestamp, block.difficulty))%251);
+        return uint8(uint256(keccak256(block.timestamp, block.difficulty))%1000);
       }
 
-      function Check_results(){
-        for (uint i = 0; i< tickets.length; i++){
-          if((tickets[i].ticket.number1==number1 && tickets[i].ticket.number2==number2) || (tickets[i].ticket.number2==number1 && tickets[i].number1==number2)){
-              pools[pool_index].winners.push(pools[pool_index].tickets[i].ticket.adr);
+
+      function Check_results(uint256 number1, uint256 number2){
+
+        uint256 total_winners = 0;
+        for (uint i = 0; i< tickets.length-tickets_init; i++){
+          if((tickets[i].number1==number1 && tickets[i].number2==number2) || (tickets[i].number2==number1 && tickets[i].number1==number2)){
+              winners.push(Winners({
+                  adr: tickets[i].adr
+              }));
+
               total_winners++;
           }
         }
+
+        Pay_winners();
       }
+
+
 
       function Pay_winners(){
 
-          pools[pool_index].winners
+             require(total_winners!=0 );
 
+             uint256 ShareAmmount = (total_pool * 85)/100;
+             next_round = (total_pool * 10)/100;
+             owner.transfer(total_pool-ShareAmmount-next_round);
+             uint256 EachAmmount = ShareAmmount / winners.length;
+            //  for(uint256 j = 0; j < total_winners-1; j++){
+            //     winners[j].transfer(EachAmmount);
+            // }
+
+
+            Reset_pool();
       }
+
 
       function Reset_pool(){
+        if(winners.length != 0){
+            total_pool= next_round;
+        }
+
+        delete winners;
+        tickets_init = tickets.length;
+        total_winners = 0;
         betsclosed = false;
         moment_now = block.timestamp;
-        moment_closes = block.timestamp + 7 days;
-        moment_lottery = moment_closes + 1 hours;
-        pool_index++;
+        moment_closes = block.timestamp +  2 minutes;
+        moment_lottery = moment_closes + 1 minutes;
 
       }
+
+      function StartLottery() public returns (uint256,uint256){
+          if(now >= moment_lottery)
+          {
+            var number1 = 1;
+            var number2 = 4;
+            Check_results(number1,number2);
+            // return (number1,number2);
+          }
+
+      }
+
+
+
+
+
 
 }
