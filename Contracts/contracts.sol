@@ -114,7 +114,7 @@ contract LotteryChain {
       function Check_results(){
         for (uint i = 0; i< tickets.length; i++){
           if((tickets[i].ticket.number1==number1 && tickets[i].ticket.number2==number2) || (tickets[i].ticket.number2==number1 && tickets[i].number1==number2)){
-              pools[pool_index].winners.push(pools[pool_index].tickets[i].ticket.address);
+              pools[pool_index].winners.push(pools[pool_index].tickets[i].ticket.adr);
               total_winners++;
           }
         }
