@@ -15,14 +15,11 @@ contract Lottery {
     Ticket[] public tickets;
     uint public total_tickets;
     uint public ticket_price;
-    uint public betting_period;
-    uint public waiting_period;
     uint public total_winners;
     bool public betsclosed;
     uint public tickets_init;
     uint public total_pool;
     uint public next_round;
-    uint256 moment_now;
     uint256 moment_closes;
     uint256 moment_lottery;
     uint256 count_down;
@@ -30,14 +27,14 @@ contract Lottery {
     Winners[] public winners;
 
 
-    function Lottery(uint _betting_period, uint _waiting_period) {
+    function Lottery(uint _moment_closes){
       ticket_price = 0.1 ether;
       total_tickets = 0;
+      total_winners = 0;
       tickets_init = 0;
       owner = msg.sender;
-      moment_now = now;
-      moment_closes = moment_now +2 minutes;
-      moment_lottery = moment_now + 1 minutes;
+      moment_closes = now +2 minutes;
+      moment_lottery = moment_closes + 1 minutes;
 
 
     }
@@ -54,6 +51,7 @@ contract Lottery {
 
         function buy_ticket(uint256 n1, uint256 n2) public payable {
       require(msg.value == ticket_price);
+      require(now<=moment_closes);
     //   require(0 > n1 && n1  <= 11);
     //   require(0 > n2 && n2  <= 11);
       require(betsclosed == false);
@@ -80,20 +78,19 @@ contract Lottery {
 
       function Check_results(uint256 number1, uint256 number2){
 
-        uint256 total_winners = 0;
-        for (uint i = 0; i< tickets.length-tickets_init; i++){
+        for (uint i = tickets_init; i< tickets.length-1; i++){
           if((tickets[i].number1==number1 && tickets[i].number2==number2) || (tickets[i].number2==number1 && tickets[i].number1==number2)){
               winners.push(Winners({
                   adr: tickets[i].adr
               }));
 
-              total_winners++;
+              total_winners+=1;
           }
         }
+        }
 
-        Pay_winners();
-      }
-
+        
+  
 
 
       function Pay_winners(){
@@ -108,8 +105,6 @@ contract Lottery {
             //     winners[j].transfer(EachAmmount);
             // }
 
-
-            Reset_pool();
       }
 
 
@@ -117,12 +112,11 @@ contract Lottery {
         if(winners.length != 0){
             total_pool= next_round;
         }
-
         delete winners;
-        tickets_init = tickets.length;
+        tickets_init+=total_tickets;
+        total_tickets=0;
         total_winners = 0;
         betsclosed = false;
-        moment_now = block.timestamp;
         moment_closes = block.timestamp +  2 minutes;
         moment_lottery = moment_closes + 1 minutes;
 
