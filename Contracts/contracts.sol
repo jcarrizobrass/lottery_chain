@@ -1,4 +1,7 @@
 pragma solidity ^0.4.2;
+
+
+
 contract Lottery {
 
       struct Ticket {
@@ -20,8 +23,11 @@ contract Lottery {
     uint public tickets_init;
     uint public total_pool;
     uint public next_round;
-    uint256 moment_closes;
-    uint256 moment_lottery;
+
+    uint public last_number1;
+    uint public last_number2;
+    /* uint256 moment_closes;
+    uint256 moment_lottery; */
     uint256 count_down;
 
     Winners[] public winners;
@@ -33,11 +39,10 @@ contract Lottery {
       total_winners = 0;
       tickets_init = 0;
       owner = msg.sender;
-      moment_closes = now +2 minutes;
-      moment_lottery = moment_closes + 1 minutes;
-
 
     }
+
+
 
     function create_ticket(uint256 n1, uint256 n2){
       tickets.push(Ticket({
@@ -47,16 +52,15 @@ contract Lottery {
       }));
       total_tickets += 1;
 
+
     }
 
-        function buy_ticket(uint256 n1, uint256 n2) public payable {
+    function buy_ticket(uint256 n1, uint256 n2) public payable {
       require(msg.value == ticket_price);
-      require(now<=moment_closes);
-    //   require(0 > n1 && n1  <= 11);
-    //   require(0 > n2 && n2  <= 11);
       require(betsclosed == false);
       create_ticket(n1,n2);
       total_pool += msg.value;
+
    }
 
     function reset_tickets() private {
@@ -65,20 +69,18 @@ contract Lottery {
 
 
       function closeBets(){
-        if(now >= moment_closes){
+        if(msg.sender == owner){
           betsclosed = true;
         }
       }
 
       function random(uint256 rand_val) private view returns (uint8) {
-        // return uint8(uint256(keccak256(block.timestamp, block.difficulty))%251);
         return uint8(uint256(keccak256(block.timestamp, block.difficulty,rand_val))%251);
       }
 
 
       function Check_results(uint256 number1, uint256 number2){
-
-        for (uint i = tickets_init; i< tickets.length-1; i++){
+        for (uint i = tickets_init; i< tickets.length; i++){
           if((tickets[i].number1==number1 && tickets[i].number2==number2) || (tickets[i].number2==number1 && tickets[i].number1==number2)){
               winners.push(Winners({
                   adr: tickets[i].adr
@@ -87,10 +89,8 @@ contract Lottery {
               total_winners+=1;
           }
         }
+        Pay_winners();
         }
-
-        
-  
 
 
       function Pay_winners(){
@@ -105,8 +105,8 @@ contract Lottery {
             //     winners[j].transfer(EachAmmount);
             // }
 
+            Reset_pool();
       }
-
 
       function Reset_pool(){
         if(winners.length != 0){
@@ -117,25 +117,23 @@ contract Lottery {
         total_tickets=0;
         total_winners = 0;
         betsclosed = false;
-        moment_closes = block.timestamp +  2 minutes;
-        moment_lottery = moment_closes + 1 minutes;
+        /* moment_closes = block.timestamp +  2 minutes;
+        moment_lottery = moment_closes + 1 minutes; */
 
       }
 
-      function StartLottery(uint256 random1, uint256 random2) public returns (uint256,uint256){
-          if(now >= moment_lottery)
+      function StartLottery(uint256 random1, uint256 random2){
+          if(msg.sender==owner)
           {
-            var number1 = random(random1);
-            var number2 = random(random2);
-            Check_results(number1,number2);
-            // return (number1,number2);
+            // var number1 = random(random1);
+            // var number2 = random(random2);
+            last_number2 = 1;
+            last_number1 = 4;
+            Check_results(last_number1,last_number2);
+
           }
 
       }
-
-
-
-
 
 
 }
