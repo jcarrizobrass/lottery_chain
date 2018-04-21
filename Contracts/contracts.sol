@@ -70,9 +70,9 @@ contract Lottery {
         }
       }
 
-      function random() private view returns (uint8) {
+      function random(uint256 rand_val) private view returns (uint8) {
         // return uint8(uint256(keccak256(block.timestamp, block.difficulty))%251);
-        return uint8(uint256(keccak256(block.timestamp, block.difficulty))%1000);
+        return uint8(uint256(keccak256(block.timestamp, block.difficulty,rand_val))%251);
       }
 
 
@@ -122,11 +122,11 @@ contract Lottery {
 
       }
 
-      function StartLottery() public returns (uint256,uint256){
+      function StartLottery(uint256 random1, uint256 random2) public returns (uint256,uint256){
           if(now >= moment_lottery)
           {
-            var number1 = 1;
-            var number2 = 4;
+            var number1 = random(random1);
+            var number2 = random(random2);
             Check_results(number1,number2);
             // return (number1,number2);
           }
