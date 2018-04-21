@@ -33,12 +33,17 @@
     </nav>
 
     <!-- Page Content -->
-    <div class="container" style="background-color: rgba(255, 255, 255, 0.8);height:100%;text-align:center;">
+    <div class="container" style="background-color: rgba(255, 255, 255, 0.8);height:100%;">
 
+      <div class="col-md-6" style="height:60px;">
+
+      </div>
       <!-- Page Heading -->
       <h1 class="md-4" style="text-align:center;">Feed the Snowball!
       </h1>
-      <h3>  <small>Hungry for momentum</small></h3>
+      <h3 style="text-align:center;">  <small>Hungry for momentum</small></h3>
+      <h4> Current snowball size:  </h2>
+
       <div style="height:60px;">  </div>
 
       <!-- Project One -->
@@ -71,9 +76,9 @@
           </a>
         </div>
 
-        <div class="col-md-6" style="text-align:left;">
+        <div class="col-md-6" style="text-align:left;background-color: rgba(255, 255, 255, 0.5);">
           <h3>Lottery</h3>
-          <p>How to feed the snowBall: Use Wei to buy SnowTickets - select your lucky numbers - wait the Lottery!</p>
+          <p>How to feed the Snowball: Use Wei to buy SnowTickets - select your lucky numbers - wait the Lottery!</p>
 
           <p>
             SnowTickets Value:
@@ -81,14 +86,25 @@
 
           </div>
 
+
           <hr />
-          <div class="col-md-12">
+
+
+
+          <div class="col-md-12 col-md-offset-2" >
+            <div class="col-md-6" style="height:60px;">
+
+            </div>
 
 
           <div class='container' style="background-color: rgba(255, 255, 255, 0.5)">
             <form>
-              <input placeholder="number 1" />
-              <input placeholder='number 2' />
+              <div class='form-group'>
+                <input type="number" placeholder="number 1" />
+              </div>
+              <div class='form-group'>
+                <input type="number" placeholder="number 2" />
+              </div>
                         <a class="btn btn-success" href="#" onclick="send_snow">Give momemtum!</a>
             </form>
           </div>
@@ -108,6 +124,19 @@
 
 
       <hr>
+
+        <div class='row'>
+          <div class="col-md-6" >
+            <a href='https://www.coingecko.com/en/price_charts/ethereum/usd?id=ethereum' target='_blank'><img alt='ethereum price' src='https://www.coingecko.com/en/widget_component/ticker/ethereum/usd.jpg'></a>
+          </div>
+
+          <div class="col-md-6" style="display:right;">
+            <ul class="list-group row">
+                 <li class="list-group-item col-xs-6">Last Snowball amount: </li>
+            </ul>
+          </div>
+        </div>
+
 
 
     </div>
