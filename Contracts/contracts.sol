@@ -1,7 +1,6 @@
 pragma solidity ^0.4.2;
 
 
-
 contract Lottery {
 
       struct Ticket {
@@ -24,8 +23,9 @@ contract Lottery {
     uint public total_pool;
     uint public next_round;
 
-    uint public last_number1;
-    uint public last_number2;
+    uint256 public last_number1;
+    uint256 public last_number2;
+    uint public last_total_winners;
     /* uint256 moment_closes;
     uint256 moment_lottery; */
     uint256 count_down;
@@ -74,9 +74,14 @@ contract Lottery {
         }
       }
 
-      function random(uint256 rand_val) private view returns (uint8) {
-        return uint8(uint256(keccak256(block.timestamp, block.difficulty,rand_val))%251);
+      function random(uint256 rand_val) private view returns (uint256) {
+        return uint256(uint8(uint256(keccak256(block.timestamp, block.difficulty,rand_val))%251));
       }
+
+      function random11(uint256 rand_val) public returns (uint256) {
+        return uint256(uint8(((uint256(keccak256(block.timestamp, block.difficulty,rand_val))%251)*11)/256));
+      }
+
 
 
       function Check_results(uint256 number1, uint256 number2){
@@ -101,10 +106,10 @@ contract Lottery {
              next_round = (total_pool * 10)/100;
              owner.transfer(total_pool-ShareAmmount-next_round);
              uint256 EachAmmount = ShareAmmount / winners.length;
-            //  for(uint256 j = 0; j < total_winners-1; j++){
-            //     winners[j].transfer(EachAmmount);
-            // }
-
+             for(uint256 j = 0; j < total_winners; j++){
+                winners[j].adr.transfer(EachAmmount);
+            }
+            last_total_winners=total_winners;
             Reset_pool();
       }
 
@@ -127,7 +132,7 @@ contract Lottery {
           {
             // var number1 = random(random1);
             // var number2 = random(random2);
-            last_number2 = 1;
+            last_number2 = random11(random1);
             last_number1 = 4;
             Check_results(last_number1,last_number2);
 
