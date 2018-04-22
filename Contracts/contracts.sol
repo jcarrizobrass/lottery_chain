@@ -138,11 +138,11 @@ contract Lottery {
       function StartLottery(uint256 seed1, uint256 seed2){
           if(msg.sender==owner)
           {
-            var number1 = 5;
+            /* var number1 = 5; */
             //var number2 = 4;
             last_number1 = random11(seed2);
             last_number2 = random11(seed1);
-            Check_results(number1,last_number2);
+            Check_results(last_number1,last_number2);
           }
 
       }
