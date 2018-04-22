@@ -1,4 +1,5 @@
 <html>
+ <meta http-equiv="Content-Type" content="text/html;charset=ISO-8859-1">
   <head>
     <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/milligram/1.2.3/milligram.min.css">
   </head>
@@ -8,23 +9,12 @@
 
 
         <div class="row">
-          <div class="column">
-            <label>Beneficiary</label>
-            <blockquote><p><em id="beneficiary">Loading..</em><br /><br /></p></blockquote>
-          </div>
+
           <div class="column">
             <label>Raised</label>
             <blockquote><p><em><span id="raised">Loading..</span><br />ETH</em></p></blockquote>
           </div>
-          <div class="column">
-            <label>Timeleft</label>
-            <blockquote><p><em id="timeleft">Loading..</em><br />seconds</p></blockquote>
-          </div>
-          <div class="column">
-            <label>Highest Bidder</label>
-            <blockquote><p><em><span id="highestBidder"></span><br />
-            <span id="highestBid"></span> ETH</em></p></blockquote>
-          </div>
+
           <div class="column">
             <label>Your Account<label>
             <blockquote><p><em id="accountAddress">Loading..</em><br /><br /></p></blockquote>
@@ -40,16 +30,18 @@
         <div class="row">
           <div class="column column-33">
             <label>From Account</label>
-            <input type="text" id="bidAccount" />
+            <select id="bidAccount">
+</select>
+
 
           </div>
           <div class="column column-25">
             <label>ETH ammount</label>
-            <text type="number" step=any id="bidAmount"  value="0.03362"  readonly>
+            <input type="number" step=any id="bidAmount"  value="1"  readonly>
           </div>
     </div>
     <hr />
-//amount, pool start lottery, bid,
+
     <div class="row">
       <div class="column">
         <label>Pool</label>
@@ -60,6 +52,16 @@
         <blockquote><p><em><span id="lastwinner">Loading..</span><br /></em></p></blockquote>
       </div>
     </div>
+    <div class="row">
+								<div class="column">
+									<label>Last Numbers</label>
+									<blockquote><p><em id="winningnumber1">Loading..</em><br /><br /></p></blockquote>
+								</div>
+								<div class="column">
+
+									<blockquote><p><em id="winningnumber2">Loading..</em><br /><br /></p></blockquote>
+								</div>
+		</div>
 
     <hr />
 
@@ -98,12 +100,13 @@
           </div>
         </div>
 
+    <div id="response"></div>
     <hr />
 
 
     <br /><br />
 
-    <div id="response"></div>
+
 
     <script type="text/javascript" src="ethereumjs-testrpc.js"></script>
     <script type="text/javascript" src="ethjs.js"></script>
@@ -495,14 +498,21 @@
             el('#raised').innerHTML = Eth.fromWei(auctionBalance, 'ether');
           });
           simpleAuctionInstance.total_pool().then(function(pool){
-            el('#pool').innerHTML = Eth.fromWei(pool, 'ether');
+            el('#pool').innerHTML = Eth.fromWei(pool[0], 'ether');
           });
           simpleAuctionInstance.last_total_winners().then(function(last_total_winner){
             el('#lastwinner').innerHTML = last_total_winner[0];
           });
+
+          simpleAuctionInstance.last_number1().then(function(last_number1){
+			el('#winningnumber1').innerHTML = last_number1[0];
+		  });
+		  simpleAuctionInstance.last_number2().then(function(last_number2){
+			el('#winningnumber2').innerHTML = last_number2[0];
+		  });
         }, 600);
 
-        SimpleAuction.new(biddingTime, beneficiary, function(deployError, deployTxHash){
+        SimpleAuction.new( beneficiary, function(deployError, deployTxHash){
           if (deployError) {
             el('#response').innerHTML = 'Hmm, there was an error: ' + String(deployError);
           }
@@ -513,14 +523,13 @@
                 simpleAuctionInstance = SimpleAuction.at(receipt.contractAddress);
                 el('#makeBid').addEventListener('click', function(){
                   var bidTxObject = {
-                    n1:el('#number1').value,
-                    n2:el('#number2').value,
+
                     from: el('#bidAccount').value,
                     value: Eth.toWei(el('#bidAmount').value, 'ether'),
                   };
                   el('#response').innerHTML = 'Placing bid..';
 
-                  simpleAuctionInstance.buy_ticket(bidTxObject, function(bidError, bidResult){
+                  simpleAuctionInstance.buy_ticket(el('#number1').value,el('#number2').value, function(bidError, bidResult){
                     if (bidError) {
                       el('#response').innerHTML = 'Hmm, there was an error' + String(bidError);
                     } else {
