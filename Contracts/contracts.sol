@@ -74,12 +74,13 @@ contract Lottery {
         }
       }
 
-      function random(uint256 rand_val) private view returns (uint256) {
-        return uint256(uint8(uint256(keccak256(block.timestamp, block.difficulty,rand_val))%251));
+      function random12() public returns(uint256){
+         last_number1 =  uint256(uint8(((uint256(keccak256(block.timestamp, block.difficulty))%251)*11)/256));
+         return last_number1;
       }
-
-      function random11(uint256 rand_val) public returns (uint256) {
-        return uint256(uint8(((uint256(keccak256(block.timestamp, block.difficulty,rand_val))%251)*11)/256));
+      function random11(uint256 rand_val) public returns(uint256) {
+         last_number2 = uint256(uint8(((uint256(keccak256(block.timestamp, block.difficulty,rand_val))%251)*11)/256));
+         return last_number2;
       }
 
 
@@ -100,16 +101,23 @@ contract Lottery {
 
       function Pay_winners(){
 
-             require(total_winners!=0 );
-
-             uint256 ShareAmmount = (total_pool * 85)/100;
+             if(total_winners!=0 ){
+                              uint256 ShareAmmount = (total_pool * 85)/100;
              next_round = (total_pool * 10)/100;
              owner.transfer(total_pool-ShareAmmount-next_round);
              uint256 EachAmmount = ShareAmmount / winners.length;
              for(uint256 j = 0; j < total_winners; j++){
                 winners[j].adr.transfer(EachAmmount);
             }
+
             last_total_winners=total_winners;
+
+             }
+             else {
+                 next_round = total_pool;
+             }
+
+
             Reset_pool();
       }
 
@@ -127,15 +135,14 @@ contract Lottery {
 
       }
 
-      function StartLottery(uint256 random1, uint256 random2){
+      function StartLottery(uint256 seed1, uint256 seed2){
           if(msg.sender==owner)
           {
-            // var number1 = random(random1);
-            // var number2 = random(random2);
-            last_number2 = random11(random1);
-            last_number1 = 4;
-            Check_results(last_number1,last_number2);
-
+            var number1 = 5;
+            //var number2 = 4;
+            last_number1 = random11(seed2);
+            last_number2 = random11(seed1);
+            Check_results(number1,last_number2);
           }
 
       }
